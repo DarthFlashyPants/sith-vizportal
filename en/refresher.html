@@ -1,0 +1,109 @@
+<html>
+
+
+<script type="text/javascript" src="http://tableau.russellchristopher.org/javascripts/api/tableau_v8.js"></script>
+
+<body>
+    <div id="container">
+        <div id="div2" class="box2" style="float:left;"></div>
+        <div class="clearfix" style="float:right;">
+            <canvas style="float:right;" class="loader"></canvas>
+        </div>
+    </div>
+
+
+
+</body>
+<script>
+    // Set refreshInterval in milliseconds.
+
+    var viz, refreshInterval = 20000,
+        whichViz = 0,
+        placeholderDiv,
+        options;
+    
+    var timer = null;
+    viz = null;
+ 
+
+
+    var url = ['http://localhost/t/TheEmpire/views/TabZap/CPULoadDashboard?:embed=y&:display_count=no&:refresh=yes',
+           'http://localhost/t/TheEmpire/views/TabZap/DiskIO?:embed=y&:display_count=no&:refresh=yes',
+           'http://localhost/t/TheEmpire/views/TabZap/CacheEffectiveness?:embed=y&:display_count=no&:refresh=yes',
+        ];
+    
+    var timer = $.timer(function () {
+         initLoader();
+    });
+    timer.set({
+        time: refreshInterval,
+        autostart: false
+    });
+
+
+
+    function initialize() {
+        placeholderDiv = document.getElementById("div2");   
+        vizUrl = url[whichViz];
+        options = {
+            width: 1240,
+            height: 780,
+            hideTabs: true,
+            hideToolbar: true,
+            onFirstInteractive: function () {                   
+                
+                timer.stop();
+                timer.set({time: refreshInterval});    
+               
+               $('.loader').ClassyLoader({
+                height: 100,
+                percentage: 100,
+                speed: (refreshInterval / 100),
+                fontSize: '20px',
+                diameter: 35,
+                lineColor: 'rgba(155,155,155,1)',
+                remainingLineColor: 'rgba(200,200,200,0.4)',
+                lineWidth: 10
+
+
+               });
+                
+
+                timer.toggle();
+            }
+        }
+        try {
+            viz = new tableauSoftware.Viz(placeholderDiv, vizUrl, options);
+        } catch (e) {
+            alert(e);
+        }
+    }
+
+    function initLoader() {
+
+            viz.dispose();
+            if (whichViz < url.length - 1) {
+                whichViz++
+            } else {
+                whichViz = 0;
+            }
+            vizUrl = url[whichViz];
+            try {
+                
+                viz = new tableauSoftware.Viz(placeholderDiv, vizUrl, options);
+            } catch (e) {
+                alert(e);
+            }
+
+
+
+    }
+    
+
+</script>
+
+
+<script type="text/javascript">
+    // Initialize the app on document ready.
+    $(initialize);
+</script>
